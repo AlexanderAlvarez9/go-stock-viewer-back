@@ -1,0 +1,315 @@
+basePath: /
+definitions:
+  httpapi.ErrorResponse:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  httpapi.PaginatedSuccessResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/stockviewer.Stock'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total_items:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  httpapi.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+  httpapi.SyncResponse:
+    properties:
+      last_sync:
+        type: string
+      new_records:
+        type: integer
+      status:
+        type: string
+      total_records:
+        type: integer
+      updated_records:
+        type: integer
+    type: object
+  stockviewer.Stock:
+    properties:
+      action:
+        type: string
+      brokerage:
+        type: string
+      company:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      rating_from:
+        type: string
+      rating_to:
+        type: string
+      recommend_score:
+        type: number
+      target_from:
+        type: number
+      target_to:
+        type: number
+      ticker:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@stockviewer.local
+    name: API Support
+  description: API for viewing and analyzing stock recommendations
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Stock Viewer API
+  version: "1.0"
+paths:
+  /api/v1/recommendations:
+    get:
+      consumes:
+      - application/json
+      description: Get top recommended stocks based on the recommendation algorithm
+      parameters:
+      - default: 10
+        description: Maximum recommendations
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpapi.SuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Get stock recommendations
+      tags:
+      - recommendations
+  /api/v1/stocks:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of stocks with optional filters
+      parameters:
+      - description: Filter by ticker symbol
+        in: query
+        name: ticker
+        type: string
+      - description: Filter by company name
+        in: query
+        name: company
+        type: string
+      - description: Filter by brokerage
+        in: query
+        name: brokerage
+        type: string
+      - description: Filter by rating
+        in: query
+        name: rating
+        type: string
+      - description: Filter by action
+        in: query
+        name: action
+        type: string
+      - description: Sort by field (ticker, company, recommend_score, created_at)
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order (ASC, DESC)
+        in: query
+        name: sort_order
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpapi.PaginatedSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: List stocks
+      tags:
+      - stocks
+  /api/v1/stocks/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get detailed information about a specific stock
+      parameters:
+      - description: Stock ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpapi.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Get stock by ID
+      tags:
+      - stocks
+  /api/v1/stocks/filters:
+    get:
+      consumes:
+      - application/json
+      description: Get available filter options for stocks (brokerages, ratings, actions)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpapi.SuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Get available filters
+      tags:
+      - stocks
+  /api/v1/stocks/search:
+    get:
+      consumes:
+      - application/json
+      description: Search stocks by ticker or company name
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        required: true
+        type: string
+      - default: 10
+        description: Maximum results
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpapi.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Search stocks
+      tags:
+      - stocks
+  /api/v1/sync:
+    post:
+      consumes:
+      - application/json
+      description: Fetch and synchronize stocks from the external KarenAI API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpapi.SyncResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "409":
+          description: Sync already in progress
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      security:
+      - BasicAuth: []
+      summary: Sync stocks from external API
+      tags:
+      - sync
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: Returns detailed health status of the service
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpapi.SuccessResponse'
+      summary: Detailed health check
+      tags:
+      - health
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: Returns pong to verify the service is running
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpapi.SuccessResponse'
+      summary: Health check endpoint
+      tags:
+      - health
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

@@ -26,17 +26,17 @@ type APIResponse struct {
 }
 
 type StockItem struct {
-	Ticker     string      `json:"ticker"`
-	Company    string      `json:"company"`
-	Brokerage  string      `json:"brokerage"`
-	Action     string      `json:"action"`
-	RatingFrom string      `json:"rating_from"`
-	RatingTo   string      `json:"rating_to"`
-	TargetFrom interface{} `json:"target_from"`
-	TargetTo   interface{} `json:"target_to"`
+	Ticker     string `json:"ticker"`
+	Company    string `json:"company"`
+	Brokerage  string `json:"brokerage"`
+	Action     string `json:"action"`
+	RatingFrom string `json:"rating_from"`
+	RatingTo   string `json:"rating_to"`
+	TargetFrom any    `json:"target_from"`
+	TargetTo   any    `json:"target_to"`
 }
 
-func parseFloat(v interface{}) float64 {
+func parseFloat(v any) float64 {
 	switch val := v.(type) {
 	case float64:
 		return val

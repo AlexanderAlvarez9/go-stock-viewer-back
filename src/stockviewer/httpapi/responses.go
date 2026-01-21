@@ -1,16 +1,18 @@
 package httpapi
 
+import "github.com/user/go-stock-viewer-back/src/stockviewer"
+
 type SuccessResponse struct {
-	Data    interface{} `json:"data"`
-	Message string      `json:"message,omitempty"`
+	Data    any    `json:"data"`
+	Message string `json:"message,omitempty"`
 }
 
 type PaginatedSuccessResponse struct {
-	Data       interface{} `json:"data"`
-	Page       int         `json:"page"`
-	PageSize   int         `json:"page_size"`
-	TotalItems int64       `json:"total_items"`
-	TotalPages int         `json:"total_pages"`
+	Data       []stockviewer.Stock `json:"data"`
+	Page       int                  `json:"page"`
+	PageSize   int                  `json:"page_size"`
+	TotalItems int64                `json:"total_items"`
+	TotalPages int                  `json:"total_pages"`
 }
 
 type ErrorResponse struct {

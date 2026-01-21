@@ -32,8 +32,8 @@ Thumbs.db
 .env.local
 .env.*.local
 
-# Generated docs (can be regenerated)
-docs/
+# Generated docs - now included in repository for easier access
+# docs/
 
 # Docker volumes
 cockroach-data/
