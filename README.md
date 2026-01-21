@@ -107,6 +107,10 @@ go test ./src/... -v
 | `KARENAI_BASE_URL` | URL de la API externa | https://api.karenai.click | No |
 | `KARENAI_TOKEN` | Token de autenticación | - | **Yes** |
 | `BASIC_AUTH_USER` | Usuario para auth básica | admin | No |
-| `BASIC_AUTH_PASSWORD` | Password para auth básica | - | **Yes** |
+| `BASIC_AUTH_PASSWORD` | Password para auth básica | - | **Yes** (Required, no default) |
 
-> ⚠️ **Security Note**: Never commit sensitive values like `KARENAI_TOKEN` and `BASIC_AUTH_PASSWORD` to version control. Use the `env.template` file as a reference and create your own `.env` file locally.
+> ⚠️ **Security Note**: 
+> - Never commit sensitive values like `KARENAI_TOKEN` and `BASIC_AUTH_PASSWORD` to version control
+> - `BASIC_AUTH_PASSWORD` is **required** and has no default value - the application will fail to start if not set
+> - Use the `env.template` file as a reference and create your own `.env` file locally
+> - Rotate passwords regularly for security

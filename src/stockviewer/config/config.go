@@ -68,7 +68,7 @@ func Load() (*Config, error) {
 		},
 		Auth: AuthConfig{
 			Username: getEnv("BASIC_AUTH_USER", "admin"),
-			Password: getEnv("BASIC_AUTH_PASSWORD", "stockviewer2024"),
+			Password: getEnvRequired("BASIC_AUTH_PASSWORD"),
 		},
 	}, nil
 }
@@ -87,4 +87,12 @@ func getEnvInt(key string, defaultValue int) int {
 		}
 	}
 	return defaultValue
+}
+
+func getEnvRequired(key string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		panic(fmt.Sprintf("required environment variable %s is not set", key))
+	}
+	return value
 }

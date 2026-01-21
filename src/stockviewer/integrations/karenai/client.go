@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/user/go-stock-viewer-back/src/stockviewer"
@@ -41,7 +42,13 @@ func parseFloat(v any) float64 {
 	case float64:
 		return val
 	case string:
-		if f, err := strconv.ParseFloat(val, 64); err == nil {
+		// Clean currency format: remove $, commas, and whitespace
+		cleaned := strings.TrimSpace(val)
+		cleaned = strings.ReplaceAll(cleaned, "$", "")
+		cleaned = strings.ReplaceAll(cleaned, ",", "")
+		cleaned = strings.TrimSpace(cleaned)
+
+		if f, err := strconv.ParseFloat(cleaned, 64); err == nil {
 			return f
 		}
 	case int:
