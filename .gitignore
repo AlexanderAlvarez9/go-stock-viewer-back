@@ -1,0 +1,47 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+build/
+/stockviewer
+
+# Test binary
+*.test
+
+# Output of go coverage
+*.out
+
+# Go workspace file
+go.work
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables - NEVER COMMIT
+.env
+.env.local
+.env.*.local
+
+# Generated docs (can be regenerated)
+docs/
+
+# Docker volumes
+cockroach-data/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/

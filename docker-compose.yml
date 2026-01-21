@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  cockroachdb:
+    image: cockroachdb/cockroach:v23.2.0
+    container_name: stockviewer-cockroachdb
+    command: start-single-node --insecure --advertise-addr=localhost
+    ports:
+      - "26257:26257"
+      - "8081:8080"
+    volumes:
+      - cockroach-data:/cockroach/cockroach-data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - stockviewer-network
+
+  cockroachdb-init:
+    image: cockroachdb/cockroach:v23.2.0
+    container_name: stockviewer-cockroachdb-init
+    depends_on:
+      cockroachdb:
+        condition: service_healthy
+    command: >
+      sql --insecure --host=cockroachdb -e "
+        CREATE DATABASE IF NOT EXISTS stockviewer;
+        USE stockviewer;
+      "
+    networks:
+      - stockviewer-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stockviewer-api
+    ports:
+      - "9000:8080"
+    env_file:
+      - .env
+    environment:
+      - SERVER_PORT=8080
+      - GIN_MODE=${GIN_MODE:-debug}
+      - DB_HOST=cockroachdb
+      - DB_PORT=26257
+      - DB_USER=${DB_USER:-root}
+      - DB_PASSWORD=${DB_PASSWORD:-}
+      - DB_NAME=${DB_NAME:-stockviewer}
+      - DB_SSLMODE=${DB_SSLMODE:-disable}
+      - KARENAI_BASE_URL=${KARENAI_BASE_URL:-https://api.karenai.click}
+      - KARENAI_TOKEN=${KARENAI_TOKEN}
+      - BASIC_AUTH_USER=${BASIC_AUTH_USER:-admin}
+      - BASIC_AUTH_PASSWORD=${BASIC_AUTH_PASSWORD}
+    depends_on:
+      cockroachdb-init:
+        condition: service_completed_successfully
+    networks:
+      - stockviewer-network
+    restart: unless-stopped
+
+networks:
+  stockviewer-network:
+    driver: bridge
+
+volumes:
+  cockroach-data:
